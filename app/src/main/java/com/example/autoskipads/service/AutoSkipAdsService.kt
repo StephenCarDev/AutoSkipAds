@@ -40,13 +40,9 @@ class AutoSkipAdsService : AccessibilityService() {
         errorLog("onInterrupt")
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        infoLog("===========>onStartCommand<=========")
-        return START_STICKY
-    }
-
     private fun startForegRround() {
         infoLog("startForegRround")
+
         createChannel(appContext)
 
         val notifyIntent = Intent(appContext, MainActivity::class.java)
@@ -101,11 +97,6 @@ class AutoSkipAdsService : AccessibilityService() {
         notificationChannel.description = "notification channel description"
         notificationChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         notificationManager.createNotificationChannel(notificationChannel)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        stopForeground(true)
     }
 
 }
