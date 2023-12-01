@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">AutoSkipAds</string>
-    <string name="label_in_manifest">AutoSkipAds</string>
+    <string name="label_in_manifest">AutoSkipAds自动跳广告</string>
     <string name="description_in_manifest">Description in manifest</string>
     <string name="description_in_xml">Description in xml</string>
+    <string name="buttontext">跳转到无障碍服务页</string>
 </resources>
