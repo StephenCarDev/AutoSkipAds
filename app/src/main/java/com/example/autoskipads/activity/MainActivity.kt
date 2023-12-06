@@ -6,11 +6,14 @@ import android.provider.Settings
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.example.autoskipads.R
+import com.example.autoskipads.utils.jumpToAnotherApp
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val larkPackageName = "com.ss.android.lark"
 
         // 通知权限
         requestPermissions(arrayOf("android.permission.POST_NOTIFICATIONS"), 200)
@@ -18,6 +21,10 @@ class MainActivity : AppCompatActivity() {
         // 跳转设置
         findViewById<Button>(R.id.btn_jumptoaccessibilityservice).setOnClickListener {
             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        }
+
+        findViewById<Button>(R.id.btn_jumptest).setOnClickListener {
+            jumpToAnotherApp(larkPackageName)
         }
 
     }

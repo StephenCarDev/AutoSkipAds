@@ -4,4 +4,5 @@
     <string name="description_in_manifest">Description in manifest</string>
     <string name="description_in_xml">Description in xml</string>
     <string name="buttontext">跳转到无障碍服务页</string>
+    <string name="jumptest">跳转测试</string>
 </resources>

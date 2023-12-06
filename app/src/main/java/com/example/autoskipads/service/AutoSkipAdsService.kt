@@ -14,6 +14,7 @@ import android.view.accessibility.AccessibilityNodeInfo
 import com.example.autoskipads.activity.MainActivity
 import com.example.autoskipads.R
 import com.example.autoskipads.base.appContext
+import com.google.clockin.utils.debugLog
 import com.google.clockin.utils.errorLog
 import com.google.clockin.utils.infoLog
 
@@ -33,6 +34,7 @@ class AutoSkipAdsService : AccessibilityService() {
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
+        debugLog("packageName: ${event.packageName}")
         scanAndClick()
     }
 
@@ -62,7 +64,7 @@ class AutoSkipAdsService : AccessibilityService() {
         mNotification = Notification.Builder(appContext, CHANNEL_ID)
             // Set the intent that will fire when the user taps the notification
             .setContentIntent(pendingIntent)
-            .setSmallIcon(R.drawable.ic_app_icon)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setAutoCancel(true)
             .setContentTitle(title)
             .setStyle(
