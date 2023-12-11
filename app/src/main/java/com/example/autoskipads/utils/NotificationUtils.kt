@@ -20,7 +20,7 @@ object NotificationUtils {
             .setSmallIcon(R.drawable.ic_launcher_background)
             .setContentTitle("一条通知")
             .setContentText("通知内容")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
             .setAutoCancel(true)
         with(NotificationManagerCompat.from(appContext)) {
             // notificationId is a unique int for each notification that you must define.

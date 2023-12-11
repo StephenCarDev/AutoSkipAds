@@ -11,4 +11,5 @@
     <string name="alarm1">闹钟一%1$s</string>
     <string name="alarm2">闹钟二%1$s</string>
     <string name="alarm3">闹钟三%1$s</string>
+    <string name="saveall">保存全部</string>
 </resources>
