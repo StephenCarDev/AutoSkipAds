@@ -6,8 +6,8 @@ import android.provider.Settings
 import com.example.autoskipads.R
 import com.example.autoskipads.base.BaseActivity
 import com.example.autoskipads.databinding.ActivityMainBinding
+import com.example.autoskipads.utils.infoLog
 import com.example.autoskipads.utils.jumpToAnotherApp
-import com.google.clockin.utils.infoLog
 
 class MainActivity : BaseActivity<ActivityMainBinding>() {
 

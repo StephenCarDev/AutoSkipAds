@@ -9,8 +9,6 @@ import com.example.autoskipads.base.appContext
 import com.example.autoskipads.data.SAVETME1
 import com.example.autoskipads.data.SAVETME2
 import com.example.autoskipads.data.SAVETME3
-import com.google.clockin.utils.debugLog
-import com.google.clockin.utils.infoLog
 import java.text.SimpleDateFormat
 
 

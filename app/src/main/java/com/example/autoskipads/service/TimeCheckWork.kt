@@ -9,8 +9,8 @@ import com.example.autoskipads.data.SAVETME2
 import com.example.autoskipads.data.SAVETME3
 import com.example.autoskipads.utils.MMKVHelper
 import com.example.autoskipads.utils.NotificationUtils
-import com.google.clockin.utils.debugLog
-import com.google.clockin.utils.infoLog
+import com.example.autoskipads.utils.debugLog
+import com.example.autoskipads.utils.infoLog
 import java.text.SimpleDateFormat
 
 class TimeCheckWork(context: Context, workerParameters: WorkerParameters) :

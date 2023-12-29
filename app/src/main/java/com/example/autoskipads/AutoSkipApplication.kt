@@ -1,10 +1,9 @@
 package com.example.autoskipads
 
 import android.app.Application
-import android.util.Log
+import com.example.autoskipads.utils.LogSetting
 import com.example.autoskipads.utils.MMKVHelper
-import com.google.clockin.utils.infoLog
-import com.tencent.mmkv.MMKV
+import com.example.autoskipads.utils.infoLog
 
 class AutoSkipApplication : Application() {
 
@@ -18,8 +17,8 @@ class AutoSkipApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        LogSetting.initLogSettings("RedfinDemo", LogSetting.LOG_VERBOSE)
         infoLog("=========>onCreate<==========")
         MMKVHelper.init("SAVETIME", false)
-
     }
 }

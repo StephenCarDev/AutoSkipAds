@@ -1,7 +1,6 @@
 package com.example.autoskipads.utils
 
 import com.example.autoskipads.base.appContext
-import com.google.clockin.utils.infoLog
 import com.tencent.mmkv.MMKV
 
 /**

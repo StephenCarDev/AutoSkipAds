@@ -14,9 +14,9 @@ import android.view.accessibility.AccessibilityNodeInfo
 import com.example.autoskipads.activity.MainActivity
 import com.example.autoskipads.R
 import com.example.autoskipads.base.appContext
-import com.google.clockin.utils.debugLog
-import com.google.clockin.utils.errorLog
-import com.google.clockin.utils.infoLog
+import com.example.autoskipads.utils.debugLog
+import com.example.autoskipads.utils.errorLog
+import com.example.autoskipads.utils.infoLog
 
 class AutoSkipAdsService : AccessibilityService() {
 

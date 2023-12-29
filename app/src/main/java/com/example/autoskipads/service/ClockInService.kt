@@ -11,17 +11,16 @@ import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Build
 import android.view.accessibility.AccessibilityEvent
-import android.view.accessibility.AccessibilityNodeInfo
 import com.example.autoskipads.R
 import com.example.autoskipads.activity.MainActivity
 import com.example.autoskipads.base.appContext
 import com.example.autoskipads.utils.SystemTimeChangeListener
 import com.example.autoskipads.utils.SystemTimeReceiver
 import com.example.autoskipads.utils.atTheCurrentTime
+import com.example.autoskipads.utils.errorLog
+import com.example.autoskipads.utils.infoLog
 import com.example.autoskipads.utils.performClickByCoordinate
-import com.google.clockin.utils.debugLog
-import com.google.clockin.utils.errorLog
-import com.google.clockin.utils.infoLog
+import com.example.autoskipads.utils.scanAndClickByText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -66,13 +65,15 @@ class ClockInService : AccessibilityService(), SystemTimeChangeListener {
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
         if (event.packageName == "com.android.deskclock" && !isTrigger
-            && !atTheCurrentTime(9, 0, 17, 30)
+            && !atTheCurrentTime(9, 30, 17, 30)
         ) {
+            isTrigger = true
+
             mainCoroutine.launch {
-                isTrigger = true
+                // 开始应用内操作
                 beginAutoClockIn()
                 // 重置标志位，锁屏
-                debugLog("1s后锁屏")
+                infoLog("1s后锁屏")
                 delay(1000L)
                 isTrigger = false
                 performGlobalAction(GLOBAL_ACTION_LOCK_SCREEN)
@@ -88,75 +89,62 @@ class ClockInService : AccessibilityService(), SystemTimeChangeListener {
         delay(1500L)
         infoLog("点通知进入系统")
         // 通过点顶部通知进入系统
-        performClickByCoordinate(this@ClockInService, 525f, 738f)
-        delay(1000L)
+        performClickByCoordinate(525f, 738f)
+        delay(2000L)
         infoLog("回到桌面了")
         performGlobalAction(GLOBAL_ACTION_HOME)
-        infoLog("确保回到第一屏")
         delay(1500L)
+        infoLog("确保回到第一屏")
         performGlobalAction(GLOBAL_ACTION_HOME)
-//        delay(500L)
-//        // 确保回到第一屏
-//        performGlobalAction(GLOBAL_ACTION_HOME)
-//        delay(1000L)
-//        performGlobalAction(GLOBAL_ACTION_NOTIFICATIONS)
-//        delay(1000L)
-//        infoLog("======关闭闹钟======")
-//        // 关闭闹钟按钮
-//        performClickByCoordinate(this@ClockInService, 876f, 1000f)
-//        delay(1000L)
-//        performGlobalAction(GLOBAL_ACTION_HOME)
         delay(2000L)
         // 飞书图标
-        infoLog("打开飞书")
-        scanAndClick("飞书")
-//            performClickByCoordinate(this@ClockInService, 645f, 979f)
+        scanAndClickByText("飞书")
         delay(4000L)
-        // 工作台图标
-        performClickByCoordinate(this@ClockInService, 466f, 2062f)
-        delay(3000L)
+        // 工作台
+        // 方法内部判断扫描到几个工作台，点第二个
+        scanAndClickByText("工作台")
+        delay(4000L)
         // 假勤
-        performClickByCoordinate(this@ClockInService, 400f, 862f)
-        debugLog("定位预留6s")
+        scanAndClickByText("假勤")
         delay(6000L)
-        debugLog("开始时段判断")
+        infoLog("开始时段判断")
         // 打卡时间判断
-        if (atTheCurrentTime(7, 0, 8, 30))
+        if (atTheCurrentTime(8, 0, 9, 30))
         // 上午
-            performClickByCoordinate(this@ClockInService, 566f, 784f)
-        else if (atTheCurrentTime(17, 30, 18, 10))
-        // 下午
-            performClickByCoordinate(this@ClockInService, 520f, 1162f)
-        else if (atTheCurrentTime(18, 11, 23, 30)) {
-            // 二次打卡
-            performClickByCoordinate(this@ClockInService, 861f, 964f)
+        {
+            performClickByCoordinate(550f, 811f)
             delay(1000L)
-            performClickByCoordinate(this@ClockInService, 725f, 1187f)
+            performClickByCoordinate(550f, 800f)
+            delay(1000L)
+            performClickByCoordinate(550f, 740f)
+            delay(1000L)
+            performClickByCoordinate(550f, 830f)
+        } else if (atTheCurrentTime(17, 30, 23, 30)) {
+            // 下午 第一次打卡
+            performClickByCoordinate(550f, 1116f)
+            delay(1000L)
+            performClickByCoordinate(559f, 1130f)
+            delay(1000L)
+            performClickByCoordinate(559f, 1100f)
+            delay(1500L)
+            // 位置无冲突，直接触发二次刷新打卡
+            performClickByCoordinate(857f, 909f)
+            delay(1000L)
+            performClickByCoordinate(849f, 978f)
+            delay(1000L)
+            performClickByCoordinate(849f, 927f)
+            delay(2000L)
+            performClickByCoordinate(736f, 1114f)
         } else {
             errorLog("非正常时段")
         }
-        debugLog("等待打卡完成")
+        infoLog("等待打卡完成")
         delay(4000L)
         performGlobalAction(GLOBAL_ACTION_HOME)
     }
 
     override fun onInterrupt() {
         errorLog("onInterrupt")
-    }
-
-    /**
-     * 获得当前视图根节点
-     * */
-    private fun scanAndClick(scanText: String) = try {
-        debugLog("scanAndClick scanText:$scanText")
-        rootInActiveWindow?.findAccessibilityNodeInfosByText(scanText)
-            .takeUnless { it.isNullOrEmpty() }?.get(0)
-            ?.run {
-                debugLog(this.className.toString())
-                performAction(AccessibilityNodeInfo.ACTION_CLICK)
-            }
-    } catch (e: Exception) {
-        e.message?.let { errorLog(it) }
     }
 
     private fun startSystemTimeListen() {

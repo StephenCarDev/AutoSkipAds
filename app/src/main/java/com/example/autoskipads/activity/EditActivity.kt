@@ -8,8 +8,8 @@ import com.example.autoskipads.data.SAVETME2
 import com.example.autoskipads.data.SAVETME3
 import com.example.autoskipads.databinding.ActivityEditBinding
 import com.example.autoskipads.utils.MMKVHelper
-import com.google.clockin.utils.debugLog
-import com.google.clockin.utils.infoLog
+import com.example.autoskipads.utils.debugLog
+import com.example.autoskipads.utils.infoLog
 
 class EditActivity : BaseActivity<ActivityEditBinding>() {
 
