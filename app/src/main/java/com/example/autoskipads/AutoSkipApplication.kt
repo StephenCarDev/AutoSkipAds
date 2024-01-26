@@ -17,7 +17,7 @@ class AutoSkipApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        LogSetting.initLogSettings("RedfinDemo", LogSetting.LOG_VERBOSE)
+        LogSetting.initLogSettings("AutoClock", LogSetting.LOG_VERBOSE)
         infoLog("=========>onCreate<==========")
         MMKVHelper.init("SAVETIME", false)
     }

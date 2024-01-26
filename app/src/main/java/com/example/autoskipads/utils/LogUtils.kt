@@ -10,7 +10,7 @@ object LogSetting {
     const val LOG_WARNING = 4
     const val LOG_ERROR = 5
 
-    var COMMON_TAG = ""
+    var COMMON_TAG = "RedfinDemo"
         private set
 
     var LOGLEVEL = 0
@@ -25,71 +25,87 @@ object LogSetting {
     }
 }
 
-fun verboseLog(message: String, tag: String? = null) {
+fun verboseLog(message: String = "", tag: String? = null) {
     if (LogSetting.LOGLEVEL > LogSetting.LOG_VERBOSE) return
     tag?.let {
-        printLog(it, message, LogSetting.LOG_VERBOSE)
+        printLog("$it $message", LogSetting.LOG_VERBOSE)
     } ?: run {
-        val stackTracePair = getStackInfo(Thread.currentThread().stackTrace)
-        printLog(stackTracePair.first, "${stackTracePair.second}: $message", LogSetting.LOG_VERBOSE)
+        printLog(
+            "${getStackInfo(Thread.currentThread())} $message",
+            LogSetting.LOG_VERBOSE
+        )
     }
 }
 
-fun debugLog(message: String, tag: String? = null) {
+fun debugLog(message: String = "", tag: String? = null) {
     if (LogSetting.LOGLEVEL > LogSetting.LOG_DEBUG) return
     tag?.let {
-        printLog(it, message, LogSetting.LOG_DEBUG)
+        printLog("$it $message", LogSetting.LOG_DEBUG)
     } ?: run {
-        val stackTracePair = getStackInfo(Thread.currentThread().stackTrace)
-        printLog(stackTracePair.first, "${stackTracePair.second}: $message", LogSetting.LOG_DEBUG)
+        printLog(
+            "${getStackInfo(Thread.currentThread())} $message",
+            LogSetting.LOG_DEBUG
+        )
     }
 }
 
-fun infoLog(message: String, tag: String? = null) {
+fun infoLog(message: String = "", tag: String? = null) {
     if (LogSetting.LOGLEVEL > LogSetting.LOG_INFO) return
     tag?.let {
-        printLog(it, message, LogSetting.LOG_INFO)
+        printLog("$it $message", LogSetting.LOG_INFO)
     } ?: run {
-        val stackTracePair = getStackInfo(Thread.currentThread().stackTrace)
-        printLog(stackTracePair.first, "${stackTracePair.second}: $message", LogSetting.LOG_INFO)
+        printLog(
+            "${getStackInfo(Thread.currentThread())} $message",
+            LogSetting.LOG_INFO
+        )
     }
 }
 
-fun warningLog(message: String, tag: String? = null) {
+fun warningLog(message: String = "", tag: String? = null) {
     if (LogSetting.LOGLEVEL > LogSetting.LOG_WARNING) return
     tag?.let {
-        printLog(it, message, LogSetting.LOG_WARNING)
+        printLog("$it $message", LogSetting.LOG_WARNING)
     } ?: run {
-        val stackTracePair = getStackInfo(Thread.currentThread().stackTrace)
-        printLog(stackTracePair.first, "${stackTracePair.second}: $message", LogSetting.LOG_WARNING)
+        printLog(
+            "${getStackInfo(Thread.currentThread())} $message",
+            LogSetting.LOG_WARNING
+        )
     }
 }
 
-fun errorLog(message: String, tag: String? = null) {
+fun errorLog(message: String = "", tag: String? = null) {
     if (LogSetting.LOGLEVEL > LogSetting.LOG_ERROR) return
     tag?.let {
-        printLog(it, message, LogSetting.LOG_ERROR)
+        printLog("$it $message", LogSetting.LOG_ERROR)
     } ?: run {
-        val stackTracePair = getStackInfo(Thread.currentThread().stackTrace)
-        printLog(stackTracePair.first, "${stackTracePair.second}: $message", LogSetting.LOG_ERROR)
+        printLog(
+            "${getStackInfo(Thread.currentThread())} $message",
+            LogSetting.LOG_ERROR
+        )
     }
 }
 
 /**
  * 获取调用栈信息
  */
-fun getStackInfo(stackTrace: Array<StackTraceElement>) =
-    Pair(stackTrace[4].className.split(".").last(), stackTrace[4].methodName)
+fun getStackInfo(thread: Thread): String {
+    val threadInfo = "thread:${thread.name}(${thread.id})"
+    val usefulStackTrace = thread.stackTrace[5]
+    return "{$threadInfo ${
+        usefulStackTrace.className.split(".").last()
+    }:${usefulStackTrace.lineNumber} ${usefulStackTrace.methodName}}"
+}
+
 
 /**
  * 实际打印处，根据等级打印log
  */
-fun printLog(tag: String, message: String, logLevel: Int) {
+fun printLog(message: String, logLevel: Int) {
     when (logLevel) {
-        LogSetting.LOG_ERROR -> Log.e(LogSetting.COMMON_TAG + tag, message)
-        LogSetting.LOG_WARNING -> Log.w(LogSetting.COMMON_TAG + tag, message)
-        LogSetting.LOG_INFO -> Log.i(LogSetting.COMMON_TAG + tag, message)
-        LogSetting.LOG_DEBUG -> Log.d(LogSetting.COMMON_TAG + tag, message)
-        LogSetting.LOG_VERBOSE -> Log.v(LogSetting.COMMON_TAG + tag, message)
+        LogSetting.LOG_ERROR -> Log.e(LogSetting.COMMON_TAG, message)
+        LogSetting.LOG_WARNING -> Log.w(LogSetting.COMMON_TAG, message)
+        LogSetting.LOG_INFO -> Log.i(LogSetting.COMMON_TAG, message)
+        LogSetting.LOG_DEBUG -> Log.d(LogSetting.COMMON_TAG, message)
+        LogSetting.LOG_VERBOSE -> Log.v(LogSetting.COMMON_TAG, message)
     }
 }

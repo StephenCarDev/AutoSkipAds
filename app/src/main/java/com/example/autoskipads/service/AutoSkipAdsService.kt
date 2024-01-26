@@ -17,6 +17,8 @@ import com.example.autoskipads.base.appContext
 import com.example.autoskipads.utils.debugLog
 import com.example.autoskipads.utils.errorLog
 import com.example.autoskipads.utils.infoLog
+import com.example.autoskipads.utils.scanAndClickById
+import com.example.autoskipads.utils.scanAndClickByText
 
 class AutoSkipAdsService : AccessibilityService() {
 
@@ -35,7 +37,9 @@ class AutoSkipAdsService : AccessibilityService() {
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
         debugLog("packageName: ${event.packageName}")
-        scanAndClick()
+        scanAndClickByText("跳过")
+        // csdn
+        scanAndClickById("tv_skip_splashimage")
     }
 
     override fun onInterrupt() {
@@ -74,17 +78,6 @@ class AutoSkipAdsService : AccessibilityService() {
             .setContentText(message).build()
 
         startForeground(999, mNotification)
-    }
-
-    /**
-     * 获得当前视图根节点，扫描文字模拟点击
-     * */
-    private fun scanAndClick(scanText: String? = "跳过") = try {
-        rootInActiveWindow?.findAccessibilityNodeInfosByText(scanText)
-            .takeUnless { it.isNullOrEmpty() }?.get(0)
-            ?.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-    } catch (e: Exception) {
-        e.message?.let { errorLog(it) }
     }
 
     private fun createChannel(context: Context) {

@@ -14,6 +14,7 @@ import android.view.accessibility.AccessibilityEvent
 import com.example.autoskipads.R
 import com.example.autoskipads.activity.MainActivity
 import com.example.autoskipads.base.appContext
+import com.example.autoskipads.data.isTriggerCockIn
 import com.example.autoskipads.utils.SystemTimeChangeListener
 import com.example.autoskipads.utils.SystemTimeReceiver
 import com.example.autoskipads.utils.atTheCurrentTime
@@ -21,9 +22,9 @@ import com.example.autoskipads.utils.errorLog
 import com.example.autoskipads.utils.infoLog
 import com.example.autoskipads.utils.performClickByCoordinate
 import com.example.autoskipads.utils.scanAndClickByText
+import com.example.autoskipads.utils.warningLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -37,9 +38,7 @@ class ClockInService : AccessibilityService(), SystemTimeChangeListener {
 
     private val receiver = SystemTimeReceiver()
 
-    private var isTrigger = false
-
-    private val mainCoroutine = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private val clockCoroutine = CoroutineScope(Dispatchers.Main)
 
     companion object {
         const val CHANNEL_ID = "samples.notification.devdeeds.com.CHANNEL_ID"
@@ -64,84 +63,92 @@ class ClockInService : AccessibilityService(), SystemTimeChangeListener {
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
-        if (event.packageName == "com.android.deskclock" && !isTrigger
-            && !atTheCurrentTime(9, 30, 17, 30)
+        if (event.packageName == "com.android.deskclock" && !isTriggerCockIn
+            && !atTheCurrentTime(9, 30, 17,30)
         ) {
-            isTrigger = true
-
-            mainCoroutine.launch {
-                // 开始应用内操作
+            infoLog("outside trigger")
+            isTriggerCockIn = true
+            clockCoroutine.launch {
+                delay(2000L)
                 beginAutoClockIn()
-                // 重置标志位，锁屏
-                infoLog("1s后锁屏")
-                delay(1000L)
-                isTrigger = false
-                performGlobalAction(GLOBAL_ACTION_LOCK_SCREEN)
             }
         }
     }
 
-    private suspend fun beginAutoClockIn() = withContext(Dispatchers.IO) {
-        infoLog("beginAutoClockIn")
-        //首先立即回到桌面
-        delay(1500L)
-        performGlobalAction(GLOBAL_ACTION_HOME)
-        delay(1500L)
-        infoLog("点通知进入系统")
-        // 通过点顶部通知进入系统
-        performClickByCoordinate(525f, 738f)
-        delay(2000L)
-        infoLog("回到桌面了")
-        performGlobalAction(GLOBAL_ACTION_HOME)
-        delay(1500L)
-        infoLog("确保回到第一屏")
-        performGlobalAction(GLOBAL_ACTION_HOME)
-        delay(2000L)
-        // 飞书图标
-        scanAndClickByText("飞书")
-        delay(4000L)
-        // 工作台
-        // 方法内部判断扫描到几个工作台，点第二个
-        scanAndClickByText("工作台")
-        delay(4000L)
-        // 假勤
-        scanAndClickByText("假勤")
-        delay(6000L)
-        infoLog("开始时段判断")
-        // 打卡时间判断
-        if (atTheCurrentTime(8, 0, 9, 30))
-        // 上午
-        {
-            performClickByCoordinate(550f, 811f)
-            delay(1000L)
-            performClickByCoordinate(550f, 800f)
-            delay(1000L)
-            performClickByCoordinate(550f, 740f)
-            delay(1000L)
-            performClickByCoordinate(550f, 830f)
-        } else if (atTheCurrentTime(17, 30, 23, 30)) {
-            // 下午 第一次打卡
-            performClickByCoordinate(550f, 1116f)
-            delay(1000L)
-            performClickByCoordinate(559f, 1130f)
-            delay(1000L)
-            performClickByCoordinate(559f, 1100f)
+    private suspend fun beginAutoClockIn() =
+        withContext(Dispatchers.Main) {
+            warningLog("Clock Service triggered")
+            //首先立即回到桌面
             delay(1500L)
-            // 位置无冲突，直接触发二次刷新打卡
-            performClickByCoordinate(857f, 909f)
-            delay(1000L)
-            performClickByCoordinate(849f, 978f)
-            delay(1000L)
-            performClickByCoordinate(849f, 927f)
+            performGlobalAction(GLOBAL_ACTION_HOME)
+            delay(1500L)
+            infoLog("点通知进入系统")
+            // 通过点顶部第一个通知进入系统
+            performClickByCoordinate(525f, 738f)
+            delay(1500L)
+            infoLog("打开通知栏")
+            performGlobalAction(GLOBAL_ACTION_NOTIFICATIONS)
             delay(2000L)
-            performClickByCoordinate(736f, 1114f)
-        } else {
-            errorLog("非正常时段")
+            infoLog("关闭闹钟按钮")
+            performClickByCoordinate(550f, 973f)
+            delay(1500L)
+            infoLog("回到桌面了")
+            performGlobalAction(GLOBAL_ACTION_HOME)
+            delay(1500L)
+            infoLog("确保回到第一屏")
+            performGlobalAction(GLOBAL_ACTION_HOME)
+            delay(2000L)
+            // 飞书图标
+            scanAndClickByText("飞书")
+            delay(4000L)
+            // 工作台
+            performClickByCoordinate(455f, 2024f)
+            delay(4000L)
+            // 假勤
+            performClickByCoordinate(400f, 859f)
+            // 预留6S定位
+            delay(6000L)
+            infoLog("开始时段判断")
+            // 打卡时间判断
+            if (atTheCurrentTime(8, 0, 9, 30))
+            // 上午
+            {
+                performClickByCoordinate(550f, 811f)
+                delay(1000L)
+                performClickByCoordinate(550f, 800f)
+                delay(1000L)
+                performClickByCoordinate(550f, 740f)
+                delay(1000L)
+                performClickByCoordinate(550f, 830f)
+            } else if (atTheCurrentTime(17, 30, 23, 30)) {
+                // 下午 先点击第一次打卡
+                performClickByCoordinate(550f, 1116f)
+                delay(1000L)
+                performClickByCoordinate(559f, 1130f)
+                delay(1000L)
+                performClickByCoordinate(559f, 1100f)
+                delay(1500L)
+                // 位置无冲突，直接触发二次刷新打卡
+                performClickByCoordinate(857f, 909f)
+                delay(1000L)
+                performClickByCoordinate(849f, 961f)
+                delay(1000L)
+                performClickByCoordinate(849f, 927f)
+                delay(2000L)
+                performClickByCoordinate(736f, 1114f)
+            } else {
+                errorLog("非正常时段")
+            }
+            infoLog("等待打卡完成，4s后回到桌面")
+            delay(4000L)
+            performGlobalAction(GLOBAL_ACTION_HOME)
+            // 重置标志位，锁屏
+            infoLog("即将重置标志位")
+            delay(1500L)
+            isTriggerCockIn = false
+            delay(100L)
+            performGlobalAction(GLOBAL_ACTION_LOCK_SCREEN)
         }
-        infoLog("等待打卡完成")
-        delay(4000L)
-        performGlobalAction(GLOBAL_ACTION_HOME)
-    }
 
     override fun onInterrupt() {
         errorLog("onInterrupt")
